@@ -4,6 +4,7 @@ import React from 'react';
 import {Provider} from 'react-redux';
 import MovieDetails from './src/MovieDetails/MovieDetails';
 import MovieList from './src/MovieList/MovieList';
+import {Routes} from './src/routes';
 import {store} from './src/store';
 
 const Stack = createStackNavigator();
@@ -14,11 +15,15 @@ const App = () => {
       <NavigationContainer>
         <Stack.Navigator>
           <Stack.Screen
-            name="List"
+            name={Routes.list}
             component={MovieList}
             options={{title: 'TMDB'}}
           />
-          <Stack.Screen name="Details" component={MovieDetails} />
+          <Stack.Screen
+            name={Routes.details}
+            component={MovieDetails}
+            options={{title: 'Details'}}
+          />
         </Stack.Navigator>
       </NavigationContainer>
     </Provider>

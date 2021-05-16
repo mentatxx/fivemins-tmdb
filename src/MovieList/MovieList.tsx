@@ -8,20 +8,22 @@ import {
 } from 'react-native';
 import {useDispatch, useSelector} from 'react-redux';
 import Colors from '../3rdparty/Colors';
+import {MovieListProps, Routes} from '../routes';
 import {RootState} from '../store';
 import MovieListItem from './components/MovieListItem';
 import SearchBar from './components/SearchBar';
-import {loadMore, startSearch} from './MovieList.store';
+import {loadMore, MovieItem, startSearch} from './MovieList.store';
 
-interface MovieListProps {}
-
-const MovieList: React.FC<MovieListProps> = () => {
+const MovieList: React.FC<MovieListProps> = ({navigation}) => {
   const dispatch = useDispatch();
   const performSearch = useCallback((text: string) => {
     dispatch(startSearch(text));
   }, []);
   const loadNextPage = useCallback(() => {
     dispatch(loadMore());
+  }, []);
+  const itemClickHandler = useCallback((item: MovieItem) => {
+    navigation.navigate(Routes.details, {item});
   }, []);
 
   const isDarkMode = useColorScheme() === 'dark';
@@ -34,12 +36,16 @@ const MovieList: React.FC<MovieListProps> = () => {
         backgroundColor: isDarkMode ? Colors.black : Colors.white,
         padding: 10,
       }}>
-      <Text>Search across thousands movies</Text>
+      <Text>Search across thousand movies</Text>
       <SearchBar onSearch={performSearch}></SearchBar>
       {!!error && <Text>Network error: {error}</Text>}
       <FlatList
         data={data}
-        renderItem={i => <MovieListItem item={i.item}></MovieListItem>}
+        renderItem={i => (
+          <MovieListItem
+            item={i.item}
+            onClick={itemClickHandler}></MovieListItem>
+        )}
         onEndReached={loadNextPage}></FlatList>
       {!!loading && <ActivityIndicator size="large" color="#00ff00" />}
     </View>
