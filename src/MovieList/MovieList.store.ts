@@ -1,6 +1,23 @@
 import {createAsyncThunk, createSlice} from '@reduxjs/toolkit';
-import {API_TOKEN, API_URL} from '../environment';
-interface MovieItem {}
+import {API_SECRET, API_URL} from '../environment';
+import {RootState} from '../store';
+
+export interface MovieItem {
+  poster_path: string;
+  adult: boolean;
+  overview: string;
+  release_date: string;
+  genre_ids: number[];
+  id: number;
+  original_title: string;
+  original_language: string;
+  title: string;
+  backdrop_path: string;
+  popularity: number;
+  vote_count: number;
+  video: boolean;
+  vote_average: number;
+}
 
 interface MovieListState {
   loading: boolean;
@@ -8,6 +25,7 @@ interface MovieListState {
   page: number;
   text: string;
   error: string;
+  totalPages: number;
   data: MovieItem[];
 }
 
@@ -17,6 +35,7 @@ const initialState: MovieListState = {
   page: 1,
   text: '',
   error: '',
+  totalPages: 1,
   data: [],
 };
 
@@ -34,26 +53,27 @@ export const MovieListSlice = createSlice({
         data: [],
       });
     },
-    nextSearchPage: state => {
-      return Object.assign(state, {
-        loading: true,
-        page: state.page + 1,
-        error: '',
-      });
-    },
     firstPageRetrieved: (state, action) => {
       return Object.assign(state, {
         loading: false,
         loaded: true,
-        data: action.payload,
+        data: action.payload.results,
+        totalPages: action.payload.total_pages,
+      });
+    },
+    //
+    nextSearchPage: state => {
+      return Object.assign(state, {
+        loading: true,
+        error: '',
       });
     },
     nextPageRetrieved: (state, action) => {
       return Object.assign(state, {
         loading: false,
         loaded: true,
-        page: action.payload.page,
-        data: state.data.concat(action.payload.data),
+        page: action.payload.data.page,
+        data: state.data.concat(action.payload.data.results),
       });
     },
     setError: (state, action) => {
@@ -70,21 +90,18 @@ export const startSearch = createAsyncThunk(
   'movieList/startSearch',
   async (text: string, {dispatch}) => {
     dispatch(initSearch(text));
+    const url = `${API_URL}/3/search/movie?query=${encodeURIComponent(
+      text,
+    )}&api_key=${API_SECRET}&page=1`;
     try {
-      const response = await fetch(
-        `${API_URL}/4/search/movie?query=${encodeURIComponent(text)}&page=1`,
-        {
-          method: 'GET',
-          headers: {
-            Authorization: `Bearer ${API_TOKEN}`,
-          },
-        },
-      );
+      const response = await fetch(url, {
+        method: 'GET',
+      });
       const data = await response.json();
-      console.log(data);
       dispatch(firstPageRetrieved(data));
       return data;
     } catch (error) {
+      console.error(url, error);
       dispatch(setError((error as Error).message));
     }
   },
@@ -93,26 +110,24 @@ export const startSearch = createAsyncThunk(
 export const loadMore = createAsyncThunk(
   'movieList/loadMore',
   async (_, {dispatch, getState}) => {
-    let {text, page} = getState() as MovieListState;
+    let {text, page, totalPages} = (getState() as RootState).movieList;
     page++;
+    if (page > totalPages) {
+      return;
+    }
     dispatch(nextSearchPage());
     try {
-      const response = await fetch(
-        `${API_URL}/4/search/movie?query=${encodeURIComponent(
-          text,
-        )}&page=${page}`,
-        {
-          method: 'GET',
-          headers: {
-            Authorization: `Bearer ${API_TOKEN}`,
-          },
-        },
-      );
+      const url = `${API_URL}/3/search/movie?query=${encodeURIComponent(
+        text,
+      )}&api_key=${API_SECRET}&page=${page}`;
+      const response = await fetch(url, {
+        method: 'GET',
+      });
       const data = await response.json();
-      console.log(data);
       dispatch(nextPageRetrieved({page, data}));
       return data;
     } catch (error) {
+      console.error(error);
       dispatch(setError((error as Error).message));
     }
   },

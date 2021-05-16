@@ -6,7 +6,7 @@ import {StyleSheet, TextInput, TouchableOpacity, View} from 'react-native';
 interface SearchBarProps {
   onSearch: (text: string) => void;
 }
-const SearchBar: React.FC<SearchBarProps> = ({onSearch}) => {
+const SearchBar: React.FC<SearchBarProps> = React.memo(({onSearch}) => {
   const [text, setText] = useState('');
   const performSearch = () => onSearch && onSearch(text);
   return (
@@ -22,7 +22,7 @@ const SearchBar: React.FC<SearchBarProps> = ({onSearch}) => {
       </TouchableOpacity>
     </View>
   );
-};
+});
 
 const styles = StyleSheet.create({
   Container: {
