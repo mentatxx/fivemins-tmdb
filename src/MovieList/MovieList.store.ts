@@ -89,7 +89,9 @@ export const MovieListSlice = createSlice({
 export const startSearch = createAsyncThunk(
   'movieList/startSearch',
   async (text: string, {dispatch}) => {
-    if (!text || !text.trim()) return;
+    if (!text || !text.trim()) {
+      return;
+    }
     dispatch(initSearch(text));
     const url = `${API_URL}/3/search/movie?query=${encodeURIComponent(
       text,

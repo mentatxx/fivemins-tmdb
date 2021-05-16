@@ -16,9 +16,10 @@ const SearchBar: React.FC<SearchBarProps> = React.memo(({onSearch}) => {
         value={text}
         placeholder="Input movie's name"
         onChangeText={setText}
-        onSubmitEditing={performSearch}></TextInput>
+        onSubmitEditing={performSearch}
+      />
       <TouchableOpacity style={styles.Button} onPress={performSearch}>
-        <FontAwesomeIcon icon={faSearch} size={30}></FontAwesomeIcon>
+        <FontAwesomeIcon icon={faSearch} size={30} />
       </TouchableOpacity>
     </View>
   );

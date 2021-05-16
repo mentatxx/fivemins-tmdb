@@ -1,4 +1,4 @@
-import React, {useCallback} from 'react';
+import React, {useCallback, useMemo} from 'react';
 import {
   ActivityIndicator,
   FlatList,
@@ -16,37 +16,45 @@ import {loadMore, MovieItem, startSearch} from './MovieList.store';
 
 const MovieList: React.FC<MovieListProps> = ({navigation}) => {
   const dispatch = useDispatch();
-  const performSearch = useCallback((text: string) => {
-    dispatch(startSearch(text));
-  }, []);
+  const performSearch = useCallback(
+    (text: string) => {
+      dispatch(startSearch(text));
+    },
+    [dispatch],
+  );
   const loadNextPage = useCallback(() => {
     dispatch(loadMore());
-  }, []);
-  const itemClickHandler = useCallback((item: MovieItem) => {
-    navigation.navigate(Routes.details, {item});
-  }, []);
+  }, [dispatch]);
+  const itemClickHandler = useCallback(
+    (item: MovieItem) => {
+      navigation.navigate(Routes.details, {item});
+    },
+    [navigation],
+  );
 
   const isDarkMode = useColorScheme() === 'dark';
-  const {data, error, loaded, loading} = useSelector(
+  const {data, error, loading} = useSelector(
     (state: RootState) => state.movieList,
   );
+  const backgroundStyle = useMemo(
+    () => ({
+      backgroundColor: isDarkMode ? Colors.black : Colors.white,
+      padding: 10,
+    }),
+    [isDarkMode],
+  );
   return (
-    <View
-      style={{
-        backgroundColor: isDarkMode ? Colors.black : Colors.white,
-        padding: 10,
-      }}>
+    <View style={backgroundStyle}>
       <Text>Search across thousand movies</Text>
-      <SearchBar onSearch={performSearch}></SearchBar>
+      <SearchBar onSearch={performSearch} />
       {!!error && <Text>Network error: {error}</Text>}
       <FlatList
         data={data}
         renderItem={i => (
-          <MovieListItem
-            item={i.item}
-            onClick={itemClickHandler}></MovieListItem>
+          <MovieListItem item={i.item} onClick={itemClickHandler} />
         )}
-        onEndReached={loadNextPage}></FlatList>
+        onEndReached={loadNextPage}
+      />
       {!!loading && <ActivityIndicator size="large" color="#00ff00" />}
     </View>
   );

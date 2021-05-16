@@ -19,16 +19,17 @@ const MovieListItem: React.FC<{
 }> = React.memo(({item, onClick}) => {
   const clickHandler = useCallback(() => {
     onClick && onClick(item);
-  }, [item]);
+  }, [item, onClick]);
   return (
     <TouchableWithoutFeedback onPress={clickHandler}>
       <View style={styles.Container}>
-        <View style={styles.Image}>
+        <View style={styles.ImageContainer}>
           <Image
-            style={{width: 120, height: 120}}
+            style={styles.Image}
             source={{
               uri: getMoviePicture(item),
-            }}></Image>
+            }}
+          />
         </View>
         <View style={styles.Description}>
           <Text style={styles.Title}>{item.title}</Text>
@@ -46,9 +47,13 @@ const styles = StyleSheet.create({
     marginTop: 10,
     flexDirection: 'row',
   },
-  Image: {
+  ImageContainer: {
     flexBasis: 120,
     flex: 0,
+  },
+  Image: {
+    width: 120,
+    height: 120,
   },
   Description: {
     flex: 1,

@@ -15,15 +15,16 @@ const MovieDetails: React.FC<MovieDetailsProps> = ({navigation, route}) => {
   useEffect(() => {
     navigation.setOptions({title: item.title});
     dispatch(fetchDetails(item));
-  }, [item]);
+  }, [item, navigation, dispatch]);
 
   return (
     <View style={styles.Container}>
       <Image
-        style={{width: '100%', height: undefined, aspectRatio: 3 / 2}}
+        style={styles.Image}
         source={{
           uri: `https://image.tmdb.org/t/p/w500${item.poster_path}`,
-        }}></Image>
+        }}
+      />
       <Text style={styles.Title}>{item.title}</Text>
       {!!item.vote_average && (
         <Text style={styles.Rating}>Rating: {item.vote_average}</Text>
@@ -47,8 +48,10 @@ const MovieDetails: React.FC<MovieDetailsProps> = ({navigation, route}) => {
 };
 
 function readableBudget(money: number) {
-  var sizes = ['', 'K', 'M', 'B', 'T'];
-  if (money == 0) return '';
+  const sizes = ['', 'K', 'M', 'B', 'T'];
+  if (!money) {
+    return '';
+  }
   const i = Math.floor(Math.log(money) / Math.log(1000));
   return '$' + Math.round((money / Math.pow(1000, i)) * 100) / 100 + sizes[i];
 }
@@ -57,6 +60,7 @@ const styles = StyleSheet.create({
   Container: {
     padding: 20,
   },
+  Image: {width: '100%', height: undefined, aspectRatio: 3 / 2},
   Title: {
     fontSize: 20,
     color: '#300',
