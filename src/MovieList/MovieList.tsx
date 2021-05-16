@@ -1,7 +1,7 @@
 import React, {useCallback, useState} from 'react';
 import {Text, useColorScheme, View} from 'react-native';
 import Colors from '../3rdparty/Colors';
-import SearchBar from '../components/SearchBar';
+import SearchBar from './components/SearchBar';
 
 interface MovieListProps {}
 
